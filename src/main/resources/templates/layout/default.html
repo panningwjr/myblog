@@ -1,0 +1,30 @@
+<#assign base=request.contextPath />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>
+        <sitemesh:write property='title'/>
+    </title>
+    <sitemesh:write property='head'/>
+    <meta name="baidu-site-verification" content="XcvG6CQwjO"/>
+    <link rel="stylesheet" href="${base}/assets/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="${base}/assets/font-awesome/4.5.0/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="${base}/assets/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style"/>
+    <link rel="stylesheet" href="${base}/assets/css/ace-skins.min.css"/>
+</head>
+<body class="no-skin">
+<script src="${base}/assets/js/jquery-2.1.4.min.js"></script>
+<#include "/layout/top.html"/>
+<div class="main-container ace-save-state" id="main-container">
+    <#include "/layout/left.html"/>
+    <div class="main-content">
+        <sitemesh:write property='body'/>
+    </div>
+    <#include "/layout/foot.html"/>
+</div>
+<script src="${base}/assets/js/bootstrap.min.js"></script>
+<!-- ace scripts -->
+<script src="${base}/assets/js/ace-elements.min.js"></script>
+<script src="${base}/assets/js/ace.min.js"></script>
+</body>
+</html>

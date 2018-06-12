@@ -1,0 +1,256 @@
+<#assign base=request.contextPath />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta charset="utf-8"/>
+    <title>添加文章</title>
+    <meta name="description" content=""/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+</head>
+<body>
+<div class="main-content">
+    <div class="modal fade " id="articleClassifyModal" tabindex="-1"
+         role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;
+                    </button>
+                    <h4 class="modal-title" id="operateEntityLabel">文章类型</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="classifyForm" class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right"
+                                   for="classifyName">类型码:</label>
+                            <div class="col-lg-9">
+                                <input type="text" id="classify" name="classify"
+                                       placeholder="jvm" class="col-xs-10 col-sm-8"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right"
+                                   for="classifyName">类型值:</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="classifyName" name="classifyName"
+                                       placeholder="Java虚拟机" class="col-xs-10 col-sm-8"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-sm"
+                            data-dismiss="modal">取消
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm"
+                            id="classifySaveBtn">
+                        <i class="ace-icon fa fa-check bigger-110"></i>提交
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="main-content-inner">
+        <div class="breadcrumbs ace-save-state" id="breadcrumbs">
+            <ul class="breadcrumb">
+                <li>
+                    <i class="ace-icon fa fa-home home-icon"></i>
+                    <a href="#">主页</a>
+                </li>
+                <li class="active">新增文章</li>
+            </ul><!-- /.breadcrumb -->
+        </div>
+        <div class="page-content">
+            <div class="page-header" style="margin: 0 0 0px;">
+                <div class="col-xs-1" style="margin-top: 6px;margin-right: -50px;">
+                    <i id="addClassify" class="ace-icon fa fa-search-plus bigger-150 blue"></i>
+                </div>
+                <div class="col-xs-2">
+                    <select class="form-control col-xs-3" id="articleClassificationSelect">
+
+                    </select>
+                </div>
+                <div class="col-xs-8">
+                    <input type="text" id="articleTitle" placeholder="标题" class="col-xs-10 col-sm-12">
+                </div>
+                <div class="col-xs-1">
+                    <button id="saveArticleBtn" type="button" class="btn btn-sm btn-success">
+                        保存
+                    </button>
+                </div>
+                <div class="row" style="margin-top: 40px;">
+                    <div class="col-xs-12">
+                        <div class="wysiwyg-editor" id="editor1"></div>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div>
+        </div><!-- /.page-content -->
+    </div>
+</div><!-- /.main-content -->
+<script src="${base}/assets/js/markdown.min.js"></script>
+<script src="${base}/assets/js/bootstrap-markdown.min.js"></script>
+<script src="${base}/assets/js/jquery.hotkeys.index.min.js"></script>
+<script src="${base}/assets/js/bootstrap-wysiwyg.min.js"></script>
+<script src="${base}/assets/js/bootbox.js"></script>
+<script type="text/javascript">
+    jQuery(function ($) {
+        $('textarea[data-provide="markdown"]').each(function () {
+            var $this = $(this);
+
+            if ($this.data('markdown')) {
+                $this.data('markdown').showEditor();
+            }
+            else $this.markdown()
+
+            $this.parent().find('.btn').addClass('btn-white');
+        })
+
+
+        function showErrorAlert(reason, detail) {
+            var msg = '';
+            if (reason === 'unsupported-file-type') {
+                msg = "Unsupported format " + detail;
+            }
+            else {
+                //console.log("error uploading file", reason, detail);
+            }
+            $('<div class="alert"> <button type="button" class="close" data-dismiss="alert">&times;</button>' +
+                '<strong>File upload error</strong> ' + msg + ' </div>').prependTo('#alerts');
+        }
+
+        $('#editor1').ace_wysiwyg({
+            toolbar:
+                [
+                    'font',
+                    null,
+                    'fontSize',
+                    null,
+                    {name: 'bold', className: 'btn-info'},
+                    {name: 'italic', className: 'btn-info'},
+                    {name: 'strikethrough', className: 'btn-info'},
+                    {name: 'underline', className: 'btn-info'},
+                    null,
+                    {name: 'insertunorderedlist', className: 'btn-success'},
+                    {name: 'insertorderedlist', className: 'btn-success'},
+                    {name: 'outdent', className: 'btn-purple'},
+                    {name: 'indent', className: 'btn-purple'},
+                    null,
+                    {name: 'justifyleft', className: 'btn-primary'},
+                    {name: 'justifycenter', className: 'btn-primary'},
+                    {name: 'justifyright', className: 'btn-primary'},
+                    {name: 'justifyfull', className: 'btn-inverse'},
+                    null,
+                    {name: 'createLink', className: 'btn-pink'},
+                    {name: 'unlink', className: 'btn-pink'},
+                    null,
+                    {name: 'insertImage', className: 'btn-success'},
+                    null,
+                    'foreColor',
+                    null,
+                    {name: 'undo', className: 'btn-grey'},
+                    {name: 'redo', className: 'btn-grey'}
+                ],
+            'wysiwyg': {
+                fileUploadError: showErrorAlert
+            }
+        }).prev().addClass('wysiwyg-style2');
+
+        $('[data-toggle="buttons"] .btn').on('click', function (e) {
+            var target = $(this).find('input[type=radio]');
+            var which = parseInt(target.val());
+            var toolbar = $('#editor1').prev().get(0);
+            if (which >= 1 && which <= 4) {
+                toolbar.className = toolbar.className.replace(/wysiwyg\-style(1|2)/g, '');
+                if (which == 1) $(toolbar).addClass('wysiwyg-style1');
+                else if (which == 2) $(toolbar).addClass('wysiwyg-style2');
+                if (which == 4) {
+                    $(toolbar).find('.btn-group > .btn').addClass('btn-white btn-round');
+                } else $(toolbar).find('.btn-group > .btn-white').removeClass('btn-white btn-round');
+            }
+        });
+
+        if (typeof jQuery.ui !== 'undefined' && ace.vars['webkit']) {
+            var lastResizableImg = null;
+
+            function destroyResizable() {
+                if (lastResizableImg == null) return;
+                lastResizableImg.resizable("destroy");
+                lastResizableImg.removeData('resizable');
+                lastResizableImg = null;
+            }
+
+            var enableImageResize = function () {
+                $('.wysiwyg-editor')
+                    .on('mousedown', function (e) {
+                        var target = $(e.target);
+                        if (e.target instanceof HTMLImageElement) {
+                            if (!target.data('resizable')) {
+                                target.resizable({
+                                    aspectRatio: e.target.width / e.target.height,
+                                });
+                                target.data('resizable', true);
+
+                                if (lastResizableImg != null) {
+                                    //disable previous resizable image
+                                    lastResizableImg.resizable("destroy");
+                                    lastResizableImg.removeData('resizable');
+                                }
+                                lastResizableImg = target;
+                            }
+                        }
+                    })
+                    .on('click', function (e) {
+                        if (lastResizableImg != null && !(e.target instanceof HTMLImageElement)) {
+                            destroyResizable();
+                        }
+                    })
+                    .on('keydown', function () {
+                        destroyResizable();
+                    });
+            }
+
+            enableImageResize();
+        }
+    });
+    (function ($) {
+        $("#saveArticleBtn").bind("click", function () {
+            var param = {};
+            param.title = $("#articleTitle").val();
+            param.classify = $("#articleClassificationSelect").val();
+            param.content = $("#editor1").html();
+            $.post("${base}/article/add", param, function (result) {
+                alert(result);
+            });
+        });
+        $("#addClassify").bind("click", function () {
+            $("#articleClassifyModal").modal("toggle");
+        });
+        $("#classifySaveBtn").bind("click", function () {
+            var classify = $("#classifyForm").serialize();
+            $.post("${base}/article/addclassification", classify, function (result) {
+                if (result == 'success') {
+                    $("#articleClassifyModal").modal("toggle");
+                    initArticleTypeSelect();
+                }
+            })
+        });
+
+        function initArticleTypeSelect() {
+            $.get("${base}/article/classifications", function (result) {
+                var options = ' <option value="">分类</option>';
+                for (var key in result) {
+                    options += '<option value="' + key + '">' + result[key] + '</option>';
+                }
+                $("#articleClassificationSelect").empty();
+                $("#articleClassificationSelect").append(options);
+            });
+        }
+
+        initArticleTypeSelect();
+
+    })($);
+</script>
+</body>
+</html>

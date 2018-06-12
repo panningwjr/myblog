@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>${(article.title)!"松哥"}</title>
+</head>
+<body>
+<div class="main-content-inner">
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12 padding-0">
+                <h1>${article.title}</h1>
+            </div>
+            <div class="col-xs-12 padding-0" style="margin-top: 10px;">
+                <div class="col-xs-10">
+                    <span style="color: #96a6b1">  ${(article.createtime)?datetime}</span>
+                </div>
+                <div class="col-xs-2">
+                    <span style="color: #96a6b1;margin-right: 10px;">阅读数:918</span>
+                </div>
+                <hr>
+            </div>
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="col-xs-12 padding-0">
+                ${(article.content)!"没有文章"}
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
