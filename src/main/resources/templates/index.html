@@ -2,25 +2,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>吕松松-个人博客</title>
+    <title>吕松松-个人网络笔记</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta charset="utf-8"/>
     <meta name="baidu-site-verification" content="XcvG6CQwjO"/>
-    <meta name="description" content="吕松松_松哥_Java工程师_吕松松的个人博客"/>
+    <meta name="description" content="吕松松_lvsongsong_songsong_松哥_Java工程师_吕松松的个人博客"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 </head>
 <body>
 <div class="main-content">
     <div class="main-content-inner">
-        <div class="breadcrumbs ace-save-state" id="breadcrumbs">
-            <ul class="breadcrumb">
-                <li>
-                    <i class="ace-icon fa fa-home home-icon"></i>
-                    <a href="#">首页</a>
-                </li>
-                <li class="active">个人资料</li>
-            </ul>
-        </div>
         <div class="page-content">
             <div class="page-header">
                 <h1 style="">
@@ -279,6 +270,9 @@
             height: '250px',
             mouseWheelLock: true,
             alwaysVisible: true
+        });
+        $.get("${base}/article/recent/3", function (result) {
+            console.log(result);
         });
     });
 </script>

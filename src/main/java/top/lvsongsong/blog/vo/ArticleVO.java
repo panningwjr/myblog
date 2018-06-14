@@ -1,12 +1,15 @@
 package top.lvsongsong.blog.vo;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author LvSS
  * @create 2018/04/27 18:18
  */
 public class ArticleVO implements Serializable {
+
+    private static final long serialVersionUID = -6233530814940225009L;
 
     @Override
     public String toString() {
@@ -15,6 +18,8 @@ public class ArticleVO implements Serializable {
                 ", title='" + title + '\'' +
                 ", classification='" + classification + '\'' +
                 ", content='" + content + '\'' +
+                ", createTime=" + createTime +
+                ", modifyTime=" + modifyTime +
                 '}';
     }
 
@@ -22,6 +27,24 @@ public class ArticleVO implements Serializable {
     private String title;
     private String classification;
     private String content;
+    private Date createTime;
+    private Date modifyTime;
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getModifyTime() {
+        return modifyTime;
+    }
+
+    public void setModifyTime(Date modifyTime) {
+        this.modifyTime = modifyTime;
+    }
 
     public String getId() {
         return id;
