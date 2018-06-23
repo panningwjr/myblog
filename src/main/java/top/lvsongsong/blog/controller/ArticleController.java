@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,7 @@ import top.lvsongsong.blog.modal.Article;
 import top.lvsongsong.blog.service.ArticleService;
 import top.lvsongsong.blog.util.BaseStringUtil;
 import top.lvsongsong.blog.vo.ArticleVO;
+import top.lvsongsong.blog.vo.ClassifyVO;
 
 import java.util.*;
 
@@ -41,7 +43,7 @@ public class ArticleController {
     private final static String REDIS_ARTICLE_TIME = "time";
 
     @Autowired
-    private RedisTemplate<Object, Object> redisTemplate;
+    private RedisTemplate<String, ? extends Object> redisTemplate;
 
     @Autowired
     private ArticleService articleService;
@@ -54,8 +56,8 @@ public class ArticleController {
     @RequestMapping("/recent/{limit}")
     public List<ArticleVO> recentArticles(@PathVariable Integer limit) {
         limit = (limit == null) ? 9 : (limit - 1);
-        Set<Object> articleids = this.redisTemplate.opsForZSet().reverseRange(REDIS_ARTICLE_TIME, 0, limit);
-        HashOperations<Object, Object, ArticleVO> hashOperations = this.redisTemplate.opsForHash();
+        Set<String> articleids = (Set<String>) this.redisTemplate.opsForZSet().reverseRange(REDIS_ARTICLE_TIME, 0, limit);
+        HashOperations<String, String, ArticleVO> hashOperations = this.redisTemplate.opsForHash();
         List<ArticleVO> articleVOS = hashOperations.multiGet(REDIS_ARTILES, articleids);
         return articleVOS;
     }
@@ -75,27 +77,58 @@ public class ArticleController {
      * @return
      */
     @RequestMapping("/indexs")
-    public Map<String, List<Object>> allArticles() {
-        HashOperations<Object, Object, Object> hashOperations = this.redisTemplate.opsForHash();
-        Map<Object, Object> classifications = hashOperations.entries(REDIS_ARTICLE_CLASSIFICATIONS);
-        TreeMap<String, List<Object>> classifyArticles = new TreeMap<>(new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return o1.compareTo(o2);
-            }
-        });
-        Long size;
-        //对文章分类进行固定顺序的排序
-        for (Map.Entry entry : classifications.entrySet()) {
-            ListOperations<Object, Object> listOperations = this.redisTemplate.opsForList();
-            size = listOperations.size(REDIS_ARTILES + ":" + entry.getKey());
+    public Map<String, List<ArticleVO>> allArticles() {
+        HashOperations<String, String, ArticleVO> hashOperations = this.redisTemplate.opsForHash();
+        ListOperations<String, ClassifyVO> classifyOperations = (ListOperations<String, ClassifyVO>) this.redisTemplate.opsForList();
+        ListOperations<String, String> articleListOperations = (ListOperations<String, String>) this.redisTemplate.opsForList();
+        Long size = classifyOperations.size(REDIS_ARTICLE_CLASSIFICATIONS);
+        List<ClassifyVO> classifications = classifyOperations.range(REDIS_ARTICLE_CLASSIFICATIONS, 0, size);
+        Map<String, List<ArticleVO>> articles = new LinkedHashMap<>(size.intValue());
+        for (ClassifyVO classifyVO : classifications) {
+            Long articleSize = articleListOperations.size(REDIS_ARTILES + ":" + classifyVO.getCode());
             //获取每个分类队列里的文章
-            List<Object> articleids = listOperations.range(REDIS_ARTILES + ":" + entry.getKey(), 0, size);
+            List<String> articleids = articleListOperations.range(REDIS_ARTILES + ":" + classifyVO.getCode(), 0, articleSize);
             //根据文章id的list从 hash中一次性取出所有的文章
-            List<Object> articleVOS = hashOperations.multiGet(REDIS_ARTILES, articleids);
-            classifyArticles.put((String) entry.getValue(), articleVOS);
+            List<ArticleVO> articleVOS = hashOperations.multiGet(REDIS_ARTILES, articleids);
+            articles.put(classifyVO.getName() + "," + classifyVO.getIcon(), articleVOS);
         }
-        return classifyArticles;
+        return articles;
+    }
+
+    /**
+     * 删除分类
+     *
+     * @param index
+     * @return
+     */
+    @RequestMapping("/classifications/delete/{index}")
+    public String deleteClassifications(@PathVariable("index") Long index) {
+        if (index > 0) {
+            ListOperations<String, ClassifyVO> operations = (ListOperations<String, ClassifyVO>) this.redisTemplate.opsForList();
+            ClassifyVO classifyVO = operations.index(REDIS_ARTICLE_CLASSIFICATIONS, index);
+            operations.remove(REDIS_ARTICLE_CLASSIFICATIONS, index, classifyVO);
+            return "success";
+        } else {
+            return "error";
+        }
+    }
+
+    /**
+     * 修改分类
+     *
+     * @param classifyVO
+     * @param index
+     * @return
+     */
+    @RequestMapping("/classifications/update/{index}")
+    public String modifyClassifications(ClassifyVO classifyVO, @PathVariable("index") Long index) {
+        ListOperations<String, ClassifyVO> operations = (ListOperations<String, ClassifyVO>) this.redisTemplate.opsForList();
+        if (index < 0) {
+            operations.rightPush(REDIS_ARTICLE_CLASSIFICATIONS, classifyVO);
+        } else {
+            operations.set(REDIS_ARTICLE_CLASSIFICATIONS, index, classifyVO);
+        }
+        return "success";
     }
 
     /**
@@ -104,20 +137,23 @@ public class ArticleController {
      * @return
      */
     @RequestMapping("/classifications")
-    public Map getClassifications() {
-        return this.redisTemplate.opsForHash().entries(REDIS_ARTICLE_CLASSIFICATIONS);
+    public List<ClassifyVO> getClassifications() {
+        ListOperations<String, ClassifyVO> operations = (ListOperations<String, ClassifyVO>) this.redisTemplate.opsForList();
+        Long len = operations.size(REDIS_ARTICLE_CLASSIFICATIONS);
+        List<ClassifyVO> clas = operations.range(REDIS_ARTICLE_CLASSIFICATIONS, 0, len);
+        return clas;
     }
 
     /**
      * 添加文章分类
      *
      * @param classify
-     * @param classifyName
      * @return
      */
     @RequestMapping("/addclassification")
-    public String addArticleClassify(String classify, String classifyName) {
-        this.redisTemplate.opsForHash().put(REDIS_ARTICLE_CLASSIFICATIONS, classify, classifyName);
+    public String addArticleClassify(ClassifyVO classify) {
+        ListOperations<String, ClassifyVO> listOperations = (ListOperations<String, ClassifyVO>) this.redisTemplate.opsForList();
+        listOperations.rightPush(REDIS_ARTICLE_CLASSIFICATIONS, classify);
         return "success";
     }
 
@@ -142,11 +178,13 @@ public class ArticleController {
             articleVO.setCreateTime(current);
             articleVO.setModifyTime(current);
             //记录文章的发布时间
-            this.redisTemplate.opsForZSet().add(REDIS_ARTICLE_TIME, articleVO.getId(), current.getTime());
+            ZSetOperations<String, String> zSetOperations = (ZSetOperations<String, String>) this.redisTemplate.opsForZSet();
+            zSetOperations.add(REDIS_ARTICLE_TIME, articleVO.getId(), current.getTime());
             //向redis 中添加文章记录hash articles: id-article
             this.redisTemplate.opsForHash().put(REDIS_ARTILES, articleVO.getId(), articleVO);
             //添加文章分类队列 list  articles:jvm id
-            this.redisTemplate.opsForList().rightPush(REDIS_ARTILES + ":" + article.getClassify(), articleVO.getId());
+            ListOperations<String, String> listOperations = (ListOperations<String, String>) this.redisTemplate.opsForList();
+            listOperations.rightPush(REDIS_ARTILES + ":" + article.getClassify(), articleVO.getId());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -163,10 +201,11 @@ public class ArticleController {
     public ModelAndView selectArticle(@PathVariable String id) {
         ModelAndView modelAndView = new ModelAndView("/articles/article_template");
         //文章访问计数+1
-        this.redisTemplate.opsForZSet().incrementScore(REDIS_ARTICLE_VIEWS, id, 1);
+        ZSetOperations<String, String> zSetOperations = (ZSetOperations<String, String>) this.redisTemplate.opsForZSet();
+        zSetOperations.incrementScore(REDIS_ARTICLE_VIEWS, id, 1);
         Article article = this.articleService.findOneByID(id);
         modelAndView.addObject("article", article);
-        modelAndView.addObject("views", this.redisTemplate.opsForZSet().score(REDIS_ARTICLE_VIEWS, id));
+        modelAndView.addObject("views", zSetOperations.score(REDIS_ARTICLE_VIEWS, id));
         return modelAndView;
     }
 }

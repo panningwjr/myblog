@@ -24,18 +24,25 @@
                     <form id="classifyForm" class="form-horizontal" role="form">
                         <div class="form-group">
                             <label class="col-sm-3 control-label no-padding-right"
-                                   for="classifyName">类型码:</label>
+                                   for="code">类型码:</label>
                             <div class="col-lg-9">
-                                <input type="text" id="classify" name="classify"
+                                <input type="text" id="code" name="code"
                                        placeholder="jvm" class="col-xs-10 col-sm-8"/>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-3 control-label no-padding-right"
-                                   for="classifyName">类型值:</label>
+                                   for="name">类型名:</label>
                             <div class="col-sm-9">
-                                <input type="text" id="classifyName" name="classifyName"
+                                <input type="text" id="name" name="name"
                                        placeholder="Java虚拟机" class="col-xs-10 col-sm-8"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right"
+                                   for="icon">图标:</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="icon" name="icon" class="col-xs-10 col-sm-8"/>
                             </div>
                         </div>
                     </form>
@@ -240,9 +247,9 @@
         function initArticleTypeSelect() {
             $.get("${base}/article/classifications", function (result) {
                 var options = ' <option value="">分类</option>';
-                for (var key in result) {
-                    options += '<option value="' + key + '">' + result[key] + '</option>';
-                }
+                result.forEach(function (item) {
+                    options += '<option value="' + item.code + '">' + item.name + '</option>';
+                });
                 $("#articleClassificationSelect").empty();
                 $("#articleClassificationSelect").append(options);
             });
