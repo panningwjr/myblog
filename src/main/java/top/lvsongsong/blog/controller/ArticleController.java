@@ -49,7 +49,7 @@ public class ArticleController {
     private ArticleService articleService;
 
     /**
-     * 最近的5篇文章
+     * 获取最近的n篇文章
      *
      * @return
      */
@@ -59,7 +59,24 @@ public class ArticleController {
         Set<String> articleids = (Set<String>) this.redisTemplate.opsForZSet().reverseRange(REDIS_ARTICLE_TIME, 0, limit);
         HashOperations<String, String, ArticleVO> hashOperations = this.redisTemplate.opsForHash();
         List<ArticleVO> articleVOS = hashOperations.multiGet(REDIS_ARTILES, articleids);
+        this.handleArticleIcon(articleVOS);
         return articleVOS;
+    }
+
+    /**
+     * 根据文章分类设置文章的图标
+     *
+     * @param articleVOS
+     */
+    private void handleArticleIcon(List<ArticleVO> articleVOS) {
+        List<ClassifyVO> classifyVOS = this.getClassifications();
+        Map<String, String> classifyIcons = new HashMap<>(classifyVOS.size());
+        for (ClassifyVO classifyVO : classifyVOS) {
+            classifyIcons.put(classifyVO.getCode(), classifyVO.getIcon());
+        }
+        for (ArticleVO articleVO : articleVOS) {
+            articleVO.setIcon(classifyIcons.get(articleVO.getClassification()));
+        }
     }
 
     /**

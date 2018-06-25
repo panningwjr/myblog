@@ -4,8 +4,10 @@
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta charset="utf-8"/>
-    <title>文章列表</title>
-    <meta name="description" content="吕松松博客中最近发布的文章"/>
+    <title>最近发布的文章</title>
+    <!-- /articles/classify_modification -->
+    <!-- /articles/add -->
+    <meta name="description" content="吕松松博客_最近发布的文章"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 </head>
 <body>
@@ -73,7 +75,7 @@
                 elements += '<div class="timeline-container"><div class="timeline-label"><span class="label label-primary arrowed-in-right label-lg"><b>' + time + '月份</b></span></div><div class="timeline-items">';
                 var articles = timelineArticles[time];
                 articles.forEach(function (article) {
-                    elements += '<div class="timeline-item clearfix"><div class="timeline-info"><i class="timeline-indicator ace-icon fa fa-cutlery btn btn-success no-hover"></i><span class="label label-info label-sm">' + article.time + '</span></div><div class="widget-box transparent" style="margin-left: 80px;"><div class="widget-body"><div class="widget-main"><a href="${base}/article/html/' + article.id + '" class="blue">' + article.title + '</a><div class="pull-right"><i class="ace-icon fa fa-clock-o bigger-110"></i>' + article.hour + '</div></div></div></div></div>';
+                    elements += '<div class="timeline-item clearfix"><div class="timeline-info"><i class="timeline-indicator ace-icon fa ' + article.icon + ' btn btn-success no-hover"></i><span class="label label-info label-sm">' + article.time + '</span></div><div class="widget-box transparent" style="margin-left: 80px;"><div class="widget-body"><div class="widget-main"><a href="${base}/article/html/' + article.id + '" class="blue">' + article.title + '</a><div class="pull-right"><i class="ace-icon fa fa-clock-o bigger-110"></i>' + article.hour + '</div></div></div></div></div>';
                 });
                 elements += '</div></div>';
             });

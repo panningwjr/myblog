@@ -20,6 +20,7 @@ public class ArticleVO implements Serializable {
                 ", content='" + content + '\'' +
                 ", createTime=" + createTime +
                 ", modifyTime=" + modifyTime +
+                ", icon='" + icon + '\'' +
                 '}';
     }
 
@@ -29,6 +30,15 @@ public class ArticleVO implements Serializable {
     private String content;
     private Date createTime;
     private Date modifyTime;
+    private String icon;
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
 
     public Date getCreateTime() {
         return createTime;
