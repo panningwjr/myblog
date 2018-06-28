@@ -71,6 +71,9 @@
         </div>
         <div class="page-content">
             <div class="page-header" style="margin: 0 0 0px;">
+                <input type="hidden" id="articleid" value="${(article.articleId)!''}">
+                <input type="hidden" id="createtime"
+                       value="${(article.createtime?string('yyyy-MM-dd HH:mm:ss'))!''}">
                 <div class="col-xs-1" style="margin-top: 6px;margin-right: -50px;">
                     <i id="addClassify" class="ace-icon fa fa-search-plus bigger-150 blue"></i>
                 </div>
@@ -80,7 +83,8 @@
                     </select>
                 </div>
                 <div class="col-xs-8">
-                    <input type="text" id="articleTitle" placeholder="标题" class="col-xs-10 col-sm-12">
+                    <input type="text" id="articleTitle" placeholder="标题" value="${(article.title)!''}"
+                           class="col-xs-10 col-sm-12">
                 </div>
                 <div class="col-xs-1">
                     <button id="saveArticleBtn" type="button" class="btn btn-sm btn-success">
@@ -89,7 +93,9 @@
                 </div>
                 <div class="row" style="margin-top: 40px;">
                     <div class="col-xs-12">
-                        <div class="wysiwyg-editor" id="editor1"></div>
+                        <div class="wysiwyg-editor" id="editor1">
+                            ${(article.content)!''}
+                        </div>
                     </div><!-- /.col -->
                 </div><!-- /.row -->
             </div>
@@ -224,20 +230,35 @@
     (function ($) {
         $("#saveArticleBtn").bind("click", function () {
             var param = {};
+            param.articleId = $("#articleid").val();
             param.title = $("#articleTitle").val();
             param.classify = $("#articleClassificationSelect").val();
             param.content = $("#editor1").html();
-            $.post("${base}/article/add", param, function (result) {
-                alert(result);
-            });
+            param.createtime = $("#createtime").val();
+            if (param.articleId == "") {
+                $.post("${base}/article", param, function (data, textStatus, request) {
+                    if (textStatus == "success") {
+                        location.href = request.getResponseHeader("Location");
+                    }
+                });
+            } else {
+                $.put("${base}/article", param, function (data, textStatus, request) {
+                    if (textStatus == "success") {
+                        location.href = request.getResponseHeader("Location");
+                    }
+                });
+            }
         });
         $("#addClassify").bind("click", function () {
             $("#articleClassifyModal").modal("toggle");
         });
         $("#classifySaveBtn").bind("click", function () {
-            var classify = $("#classifyForm").serialize();
-            $.post("${base}/article/addclassification", classify, function (result) {
-                if (result == 'success') {
+            var classify = {};
+            $("#classifyForm").serializeArray().map(function (item) {
+                classify[item.name] = item.value;
+            })
+            $.post("${base}/articleclassifies", classify, function (data, textStatus, request) {
+                if (textStatus == 'success') {
                     $("#articleClassifyModal").modal("toggle");
                     initArticleTypeSelect();
                 }
@@ -245,14 +266,14 @@
         });
 
         function initArticleTypeSelect() {
-            $.get("${base}/article/classifications", function (result) {
+            $.get("${base}/articleclassifies", function (result) {
                 var options = ' <option value="">分类</option>';
                 result.forEach(function (item) {
-                    options += '<option value="' + item.code + '">' + item.name + '</option>';
+                    options += '<option value="' + item.code + '" ' + ("${(article.classify)!''}" == item.code ? "selected" : "") + '>' + item.name + '</option>';
                 });
                 $("#articleClassificationSelect").empty();
                 $("#articleClassificationSelect").append(options);
-            });
+            }, "json");
         }
 
         initArticleTypeSelect();

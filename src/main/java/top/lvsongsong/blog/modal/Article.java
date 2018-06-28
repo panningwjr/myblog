@@ -1,8 +1,11 @@
 package top.lvsongsong.blog.modal;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 public class Article {
+
     private String articleId;
 
     private String title;
@@ -11,6 +14,7 @@ public class Article {
 
     private String classify;
 
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createtime;
 
     private Date modifytime;
@@ -72,4 +76,18 @@ public class Article {
     public void setContent(String content) {
         this.content = content == null ? null : content.trim();
     }
+
+    @Override
+    public String toString() {
+        return "Article{" +
+                "articleId='" + articleId + '\'' +
+                ", title='" + title + '\'' +
+                ", keywords='" + keywords + '\'' +
+                ", classify='" + classify + '\'' +
+                ", createtime=" + createtime +
+                ", modifytime=" + modifytime +
+                ", content='" + content + '\'' +
+                '}';
+    }
+
 }

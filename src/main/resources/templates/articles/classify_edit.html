@@ -82,8 +82,8 @@
 
             $("#deleteClassifyBtn").bind("click", function () {
                 if (selectedClassify > 0) {
-                    $.post("${base}/article/classifications/delete/" + selectedClassify, function (result) {
-                        if (result == "success") {
+                    $.delete("${base}/articleclassifies/" + selectedClassify, function (data, textStatus) {
+                        if (textStatus == "success") {
                             location.reload(true);
                         } else {
                             alert("失败!");
@@ -97,15 +97,15 @@
                 classify.name = $("#name").val();
                 classify.code = $("#code").val();
                 classify.icon = $("#icon").val();
-                $.post("${base}/article/classifications/update/" + selectedClassify, classify, function (result) {
-                    if (result == 'success') {
+                $.put("${base}/articleclassifies/" + selectedClassify, classify, function (data, textStatus) {
+                    if (textStatus == 'success') {
                         location.reload(true);
                     }
                 })
             });
 
             function initClassifySelect() {
-                $.get("${base}/article/classifications", function (result) {
+                $.get("${base}/articleclassifies", function (result) {
                     var options = '<option value="-1">--请选择--</option>';
                     result.forEach(function (item, index) {
                         options += '<option value="' + index + '" code="' + item.code + '">' + item.name + '</option>';

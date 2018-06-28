@@ -18,5 +18,17 @@ public interface ArticleService {
      */
     Article findOneByID(String articleID);
 
+    /**
+     * 修改文章
+     *
+     * @param article
+     */
     void saveArticle(Article article);
+
+    /**
+     * 更新文章
+     *
+     * @param article
+     */
+    void updateAtricle(Article article);
 }

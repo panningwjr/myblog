@@ -33,8 +33,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
         FilterRegistrationBean fitler = new FilterRegistrationBean();
         SiteMeshFilter siteMeshFilter = new SiteMeshFilter();
         fitler.setFilter(siteMeshFilter);
-        fitler.addUrlPatterns("/views/*", "/article/html/*");
+        fitler.addUrlPatterns("/views/*", "/article/html/*", "/article/editview/*");
         return fitler;
     }
-
 }

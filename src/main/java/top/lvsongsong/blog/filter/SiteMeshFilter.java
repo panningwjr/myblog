@@ -10,6 +10,6 @@ import org.sitemesh.config.ConfigurableSiteMeshFilter;
 public class SiteMeshFilter extends ConfigurableSiteMeshFilter {
     @Override
     protected void applyCustomConfiguration(SiteMeshFilterBuilder builder) {
-        builder.addDecoratorPath("/views/*", "/views/layout/default.html").addExcludedPath("/views/layout/default.html").addDecoratorPath("/article/html/*", "/views/layout/default.html");
+        builder.addDecoratorPath("/views/*", "/views/layout/default.html").addExcludedPath("/views/layout/default.html").addDecoratorPath("/article/html/*", "/views/layout/default.html").addDecoratorPath("/article/editview/*", "/views/layout/default.html");
     }
 }
