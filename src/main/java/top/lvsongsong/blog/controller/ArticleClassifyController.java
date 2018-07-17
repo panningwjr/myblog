@@ -36,7 +36,7 @@ public class ArticleClassifyController {
             operations.remove(RedisConstants.REDIS_ARTICLE_CLASSIFICATIONS, index, classifyVO);
             return new ResponseEntity(HttpStatus.CREATED);
         } else {
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
+            return new ResponseEntity(HttpStatus.OK);
         }
     }
 
