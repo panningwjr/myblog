@@ -23,7 +23,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
 
     @Override
     protected void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("redirect:/views/timeline.html");
+        registry.addViewController("/").setViewName("redirect:/views/index.html");
         registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
         super.addViewControllers(registry);
     }

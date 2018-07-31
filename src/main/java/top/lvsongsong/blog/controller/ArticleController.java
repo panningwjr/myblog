@@ -36,6 +36,26 @@ public class ArticleController {
     private ArticleService articleService;
 
     /**
+     * 文章数量及访问量统计
+     *
+     * @return
+     */
+    @GetMapping("/statistics")
+    public Map<String, Object> accessCounts() {
+        ZSetOperations<String, ArticleVO> operations = (ZSetOperations<String, ArticleVO>) this.redisTemplate.opsForZSet();
+        Long totalArticles = operations.zCard(RedisConstants.REDIS_ARTICLE_VIEWS);
+        Set<ZSetOperations.TypedTuple<ArticleVO>> articleVOS = operations.rangeWithScores(RedisConstants.REDIS_ARTICLE_VIEWS, 0L, totalArticles);
+        Double totalCounts = 0.0d;
+        Map<String, Object> result = new HashMap<>(4);
+        for (ZSetOperations.TypedTuple<ArticleVO> articleWithScore : articleVOS) {
+            totalCounts += articleWithScore.getScore();
+        }
+        result.put("articles", totalArticles);
+        result.put("accesscounts", totalCounts);
+        return result;
+    }
+
+    /**
      * 获取修改文章的页面
      *
      * @param articleid

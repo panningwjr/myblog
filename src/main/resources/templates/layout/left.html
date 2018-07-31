@@ -2,8 +2,8 @@
     <ul class="nav nav-list" id="articleLst">
         <li class="">
             <a href="${base}/views/timeline.html">
-                <i class="menu-icon fa fa-tachometer"></i>
-                <span class="menu-text"> 首页 </span>
+                <i class="menu-icon glyphicon glyphicon-list"></i>
+                <span class="menu-text"> 文章列表 </span>
             </a>
             <b class="arrow"></b>
         </li>
@@ -21,7 +21,7 @@
                     var classify;
                     for (var key in result) {
                         classify = key.split(",");
-                        articleLst += ' <li class=""><a href="#" class="dropdown-toggle"><i class="menu-icon fa ' + classify[1] + '"></i><span class="menu-text"> ' + classify[0] + ' </span><b class="arrow fa fa-angle-down"></b></a><b class="arrow"></b><ul class="submenu">';
+                        articleLst += ' <li class=""><a href="#" class="dropdown-toggle"><i class="menu-icon fa ' + classify[1] + '"></i><span class="menu-text"> ' + classify[0] + '<span class="badge gray">' + result[key].length + '</span></span><b class="arrow fa fa-angle-down"></b></a><b class="arrow"></b><ul class="submenu">';
                         result[key].forEach(function (article) {
                             articleLst += '<li class=""> <a href="${base}/article/html/' + article.id + '"> <i class="menu-icon fa fa-caret-right"></i>' + article.title + '</a> <b class="arrow"></b></li>';
                         });
