@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /views/articles/add
+Disallow: /views/articles/classify_edit
